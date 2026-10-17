@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('My results', 'history', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1>My results</h1>
+            <p>Every exam you have completed.</p>
+        </div>
+    </div>
+    <div class="table-wrap" th:if="${attempts.hasContent()}">
+        <table class="table">
+            <thead><tr><th scope="col">Exam</th><th scope="col" class="num">Score</th><th scope="col" class="num">Percentage</th><th scope="col">Result</th><th scope="col">Time taken</th><th scope="col">Submitted</th><th scope="col">Actions</th></tr></thead>
+            <tbody>
+            <tr th:each="a : ${attempts.content}">
+                <td class="cell-title" th:text="${a.examTitle}">Exam</td>
+                <td class="num" th:text="${a.score} + ' / ' + ${a.totalMarks}">0</td>
+                <td class="num" th:text="${a.percentage} + '%'">0%</td>
+                <td><span class="badge badge-success" th:if="${a.passed}">Pass</span><span class="badge badge-danger" th:unless="${a.passed}">Fail</span></td>
+                <td th:text="${a.timeTakenText}">0m</td>
+                <td th:text="${#temporals.format(a.submittedAt, 'dd MMM yyyy HH:mm')}">date</td>
+                <td>
+                    <div class="cell-actions">
+                        <a class="btn btn-small" th:href="@{/student/attempts/{id}/result(id=${a.attemptId})}">Review</a>
+                        <a class="btn btn-small" th:href="@{/student/exams/{id}/leaderboard(id=${a.examId})}">Leaderboard</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card empty-state" th:unless="${attempts.hasContent()}">
+        <h3>No completed exams yet</h3>
+        <p>After you submit an exam it is listed here with a full review.</p>
+        <a class="btn btn-primary" th:href="@{/student/exams}">Browse exams</a>
+    </div>
+    <div th:replace="~{fragments/parts :: pagination(${attempts}, '/student/history', ${extraQuery})}"></div>
+</th:block>
+</body>
+</html>

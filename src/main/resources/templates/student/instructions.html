@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('Exam instructions', 'exams', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${card.exam.title}">Exam</h1>
+            <p>
+                <span class="badge" th:classappend="'badge-' + ${card.exam.status.badgeClass}" th:text="${card.exam.status.label}">Live</span>
+                <span th:text="'by ' + ${card.exam.teacherName}"></span>
+            </p>
+        </div>
+    </div>
+    <section class="card" aria-labelledby="details-title">
+        <h2 id="details-title">Exam details</h2>
+        <p th:if="${card.exam.description != null}" th:text="${card.exam.description}"></p>
+        <dl class="summary-list">
+            <dt>Questions</dt><dd th:text="${card.exam.questionCount}"></dd>
+            <dt>Total marks</dt><dd th:text="${card.exam.totalMarks}"></dd>
+            <dt>Duration</dt><dd th:text="${card.exam.durationMinutes} + ' minutes'"></dd>
+            <dt>Pass mark</dt><dd th:text="${card.exam.passingPercentage} + '%'"></dd>
+            <dt>Opens</dt><dd th:text="${#temporals.format(card.exam.startTime, 'dd MMM yyyy HH:mm')}"></dd>
+            <dt>Closes</dt><dd th:text="${#temporals.format(card.exam.endTime, 'dd MMM yyyy HH:mm')}"></dd>
+            <dt>Retakes</dt><dd th:text="${card.exam.allowRetake} ? 'Allowed' : 'Not allowed'"></dd>
+        </dl>
+    </section>
+    <section class="card" aria-labelledby="rules-title">
+        <h2 id="rules-title">Rules</h2>
+        <ul>
+            <li>The timer runs on the server and starts when you press Start. Leaving the page does not pause it.</li>
+            <li>Your answers are saved automatically each time you choose an option. Reloading restores them.</li>
+            <li>Switching tabs or windows is recorded. After <strong th:text="${card.exam.maxViolations}">3</strong> violations the exam is submitted automatically.</li>
+            <li>Copying, pasting and the context menu are disabled on the exam page.</li>
+            <li>Use the question navigator to move between questions and flag questions for review.</li>
+            <li>The exam is submitted automatically when time runs out.</li>
+        </ul>
+    </section>
+    <div class="btn-row">
+        <form th:action="@{/student/exams/{id}/start(id=${card.exam.id})}" method="post" th:if="${card.canStart}">
+            <button type="submit" class="btn btn-primary" th:text="${card.activeAttemptId != null} ? 'Resume attempt' : 'Start exam'">Start exam</button>
+        </form>
+        <a class="btn" th:if="${hasCompleted}" th:href="@{/student/exams/{id}/leaderboard(id=${card.exam.id})}">Leaderboard</a>
+        <a class="btn" th:href="@{/student/exams}">Back to exams</a>
+    </div>
+    <div class="alert alert-info" style="margin-top:1rem" th:if="${!card.canStart}">
+        <span th:if="${card.completed and !card.exam.allowRetake}">You have already completed this exam and retakes are not allowed.</span>
+        <span th:if="${!card.completed and card.exam.status.name() == 'SCHEDULED'}" th:text="'This exam opens on ' + ${#temporals.format(card.exam.startTime, 'dd MMM yyyy HH:mm')} + '.'"></span>
+        <span th:if="${card.exam.status.name() == 'ENDED'}">This exam has closed.</span>
+    </div>
+</th:block>
+</body>
+</html>

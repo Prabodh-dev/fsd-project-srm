@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('Dashboard', 'dashboard', ~{::content}, 'chart.umd.js charts.js')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1>Student dashboard</h1>
+            <p>Your exams and your progress.</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/student/exams}">Browse exams</a>
+    </div>
+    <div class="grid grid-3">
+        <div class="card stat"><span class="stat-value" th:text="${dashboard.completedCount}">0</span><span class="stat-label">Exams completed</span></div>
+        <div class="card stat"><span class="stat-value" th:text="${dashboard.averagePercentage} + '%'">0%</span><span class="stat-label">Average score</span></div>
+        <div class="card stat"><span class="stat-value" th:text="${dashboard.bestPercentage} + '%'">0%</span><span class="stat-label">Best score</span></div>
+    </div>
+
+    <section class="card" aria-labelledby="live-title">
+        <div class="card-title"><h2 id="live-title">Live exams</h2></div>
+        <div class="empty-state" th:if="${dashboard.live.isEmpty()}"><p>No exams are open right now. Check upcoming exams below or browse all exams.</p></div>
+        <div class="grid grid-2" th:if="${!dashboard.live.isEmpty()}">
+            <article class="card" th:each="card : ${dashboard.live}">
+                <h3 th:text="${card.exam.title}">Exam</h3>
+                <p class="hint" th:text="${card.exam.durationMinutes} + ' minutes, closes ' + ${#temporals.format(card.exam.endTime, 'dd MMM yyyy HH:mm')}"></p>
+                <a class="btn btn-primary" th:if="${card.activeAttemptId != null}" th:href="@{/student/attempts/{id}(id=${card.activeAttemptId})}">Resume attempt</a>
+                <a class="btn btn-primary" th:if="${card.activeAttemptId == null and card.canStart}" th:href="@{/student/exams/{id}/instructions(id=${card.exam.id})}">View instructions</a>
+                <a class="btn" th:if="${card.activeAttemptId == null and !card.canStart}" th:href="@{/student/exams/{id}/instructions(id=${card.exam.id})}">Completed - details</a>
+            </article>
+        </div>
+    </section>
+
+    <section class="card" aria-labelledby="upcoming-title">
+        <div class="card-title"><h2 id="upcoming-title">Upcoming exams</h2></div>
+        <div class="empty-state" th:if="${dashboard.upcoming.isEmpty()}"><p>No upcoming exams are scheduled.</p></div>
+        <ul th:if="${!dashboard.upcoming.isEmpty()}">
+            <li th:each="card : ${dashboard.upcoming}">
+                <strong th:text="${card.exam.title}">Exam</strong>
+                <span class="hint" th:text="'opens ' + ${#temporals.format(card.exam.startTime, 'dd MMM yyyy HH:mm')} + ', ' + ${card.exam.durationMinutes} + ' minutes'"></span>
+            </li>
+        </ul>
+    </section>
+
+    <section class="card" aria-labelledby="trend-title">
+        <div class="card-title"><h2 id="trend-title">Score trend</h2></div>
+        <div class="empty-state" th:if="${dashboard.completedCount == 0}"><p>Your score trend appears here after you complete your first exam.</p></div>
+        <div class="chart-box" th:if="${dashboard.completedCount > 0}">
+            <canvas data-chart-kind="trend" th:attr="data-chart=${dashboard.trendJson}" role="img" aria-label="Line chart of your score percentages over time"></canvas>
+        </div>
+    </section>
+
+    <section class="card" aria-labelledby="completed-title">
+        <div class="card-title"><h2 id="completed-title">Recently completed</h2><a th:href="@{/student/history}">All results</a></div>
+        <div class="empty-state" th:if="${dashboard.completed.isEmpty()}"><p>You have not completed any exams yet.</p></div>
+        <div class="table-wrap" th:if="${!dashboard.completed.isEmpty()}">
+            <table class="table">
+                <thead><tr><th scope="col">Exam</th><th scope="col" class="num">Score</th><th scope="col">Result</th><th scope="col">Submitted</th><th scope="col">Details</th></tr></thead>
+                <tbody>
+                <tr th:each="a : ${dashboard.completed}">
+                    <td class="cell-title" th:text="${a.examTitle}">Exam</td>
+                    <td class="num" th:text="${a.score} + ' / ' + ${a.totalMarks} + ' (' + ${a.percentage} + '%)'"></td>
+                    <td><span class="badge badge-success" th:if="${a.passed}">Pass</span><span class="badge badge-danger" th:unless="${a.passed}">Fail</span></td>
+                    <td th:text="${#temporals.format(a.submittedAt, 'dd MMM yyyy HH:mm')}"></td>
+                    <td><a class="btn btn-small" th:href="@{/student/attempts/{id}/result(id=${a.attemptId})}">Review</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</th:block>
+</body>
+</html>

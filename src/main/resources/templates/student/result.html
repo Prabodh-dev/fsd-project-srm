@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('Result', 'history', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${result.summary.examTitle}">Exam</h1>
+            <p class="print-only" th:text="${result.summary.studentName} + ' - ' + ${#temporals.format(result.summary.submittedAt, 'dd MMM yyyy HH:mm')}"></p>
+            <p class="no-print">Your result and a full review of every question.</p>
+        </div>
+        <div class="btn-row no-print">
+            <a class="btn btn-primary" th:href="@{/student/attempts/{id}/result.pdf(id=${result.summary.attemptId})}">Download result PDF</a>
+            <button type="button" class="btn" data-print>Print</button>
+            <a class="btn" th:href="@{/student/exams/{id}/leaderboard(id=${result.summary.examId})}">Leaderboard</a>
+        </div>
+    </div>
+    <section class="card" aria-labelledby="score-title">
+        <h2 id="score-title" class="sr-only" style="position:absolute;left:-999px">Score summary</h2>
+        <div class="grid grid-4">
+            <div class="stat"><span class="stat-value" th:text="${result.summary.score} + ' / ' + ${result.summary.totalMarks}">0 / 0</span><span class="stat-label">Score</span></div>
+            <div class="stat"><span class="stat-value" th:text="${result.summary.percentage} + '%'">0%</span><span class="stat-label">Percentage</span></div>
+            <div class="stat">
+                <span class="stat-value">
+                    <span class="badge badge-success" th:if="${result.summary.passed}">Passed</span>
+                    <span class="badge badge-danger" th:unless="${result.summary.passed}">Failed</span>
+                </span>
+                <span class="stat-label" th:text="'Pass mark ' + ${result.passingPercentage} + '%'">Pass mark</span>
+            </div>
+            <div class="stat"><span class="stat-value" th:text="${result.summary.timeTakenText}">0m</span><span class="stat-label">Time taken</span></div>
+        </div>
+        <p class="hint" style="margin-top:1rem"
+           th:text="'Status: ' + ${result.summary.status} + '. Proctoring violations recorded: ' + ${result.violationCount} + '.'"></p>
+    </section>
+    <section aria-labelledby="review-title">
+        <h2 id="review-title">Question review</h2>
+        <div th:fragment="reviewList(items)">
+            <article class="review-item" th:each="item : ${items}"
+                     th:classappend="${item.correct} ? 'is-correct' : (${item.answered} ? 'is-wrong' : 'is-skipped')">
+                <div class="review-head">
+                    <div>
+                        <strong th:text="'Question ' + ${item.number}">Question 1</strong>
+                        <p class="question-text" th:text="${item.questionText}" style="margin:0.25rem 0 0">Text</p>
+                    </div>
+                    <div style="text-align:right">
+                        <span class="badge badge-success" th:if="${item.correct}">Correct</span>
+                        <span class="badge badge-danger" th:if="${item.answered and !item.correct}">Incorrect</span>
+                        <span class="badge badge-warning" th:unless="${item.answered}">Not answered</span>
+                        <div class="cell-sub" th:text="${item.awarded} + ' / ' + ${item.marks} + ' marks'">0 / 1 marks</div>
+                    </div>
+                </div>
+                <ul class="review-options">
+                    <li th:each="option : ${item.options}"
+                        th:classappend="${option.correct} ? 'correct' : (${option.chosen} ? 'chosen-wrong')">
+                        <span th:text="${option.text}">Option</span>
+                        <span class="option-tag" th:if="${option.correct}">Correct answer</span>
+                        <span class="option-tag" th:if="${option.chosen}">Chosen</span>
+                    </li>
+                </ul>
+            </article>
+        </div>
+    </section>
+</th:block>
+</body>
+</html>

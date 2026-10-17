@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('Leaderboard', 'exams', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${exam.title} + ' - leaderboard'">Leaderboard</h1>
+            <p>Top 10 students, ranked by score and then by completion time.</p>
+        </div>
+        <a class="btn" th:href="@{/student/history}">My results</a>
+    </div>
+    <div class="table-wrap" th:if="${!rows.isEmpty()}">
+        <table class="table">
+            <thead><tr><th scope="col" class="num">Rank</th><th scope="col">Student</th><th scope="col" class="num">Score</th><th scope="col" class="num">Percentage</th><th scope="col">Time taken</th></tr></thead>
+            <tbody>
+            <tr th:each="row : ${rows}" th:classappend="${row.currentStudent} ? 'row-highlight'">
+                <td class="num" th:text="${row.rank}">1</td>
+                <td class="cell-title"><span th:text="${row.studentName}">Name</span> <span class="badge badge-info" th:if="${row.currentStudent}">You</span></td>
+                <td class="num" th:text="${row.score} + ' / ' + ${row.totalMarks}">0</td>
+                <td class="num" th:text="${row.percentage} + '%'">0%</td>
+                <td th:text="${row.timeTakenText}">0m</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card empty-state" th:if="${rows.isEmpty()}"><h3>No results yet</h3><p>The leaderboard fills up as students submit this exam.</p></div>
+</th:block>
+</body>
+</html>

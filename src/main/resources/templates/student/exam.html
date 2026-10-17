@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/parts :: head(${examSession.examTitle})}"></head>
+<body class="exam-secure">
+<a class="skip-link" href="#questions">Skip to questions</a>
+<div id="examRoot"
+     th:data-attempt-id="${examSession.attemptId}"
+     th:data-remaining="${examSession.remainingSeconds}"
+     th:data-violations="${examSession.violationCount}"
+     th:data-max-violations="${examSession.maxViolations}"
+     th:data-api-base="@{/student/api/attempts/{id}(id=${examSession.attemptId})}"
+     th:data-result-url="@{/student/attempts/{id}/result(id=${examSession.attemptId})}">
+
+    <header class="exam-bar">
+        <div>
+            <strong th:text="${examSession.examTitle}">Exam</strong>
+            <div class="save-status" id="saveStatus" role="status" aria-live="polite">All changes saved</div>
+        </div>
+        <div class="btn-row">
+            <span class="violation-counter" id="violationCounter">Warnings: <span id="violationCount" th:text="${examSession.violationCount}">0</span> / <span th:text="${examSession.maxViolations}">3</span></span>
+            <span class="timer" id="timer" role="timer" aria-label="Time remaining">--:--</span>
+            <button type="button" class="btn btn-small" data-theme-toggle aria-pressed="false">Dark theme</button>
+            <button type="button" class="btn btn-primary" id="openSubmit">Submit exam</button>
+        </div>
+    </header>
+
+    <main class="content" id="questions">
+        <div class="alert alert-error warning-banner" id="violationBanner" role="alert"></div>
+        <div class="exam-layout">
+            <div>
+                <section class="card question-panel" th:each="q, stat : ${examSession.questions}"
+                         th:classappend="${stat.first} ? 'current'"
+                         th:data-index="${stat.index}" th:data-question-id="${q.id}">
+                    <p class="hint" th:text="'Question ' + ${q.number} + ' of ' + ${examSession.questions.size()} + ' - ' + ${q.marks} + (${q.marks == 1} ? ' mark' : ' marks')">Question 1</p>
+                    <h2 class="question-text" th:id="'question-text-' + ${q.id}" th:text="${q.text}">Question</h2>
+                    <ul class="option-list" role="radiogroup" th:attr="aria-labelledby='question-text-' + ${q.id}">
+                        <li th:each="o : ${q.options}">
+                            <label class="option-label">
+                                <input type="radio" class="option-input" th:name="${'question-' + q.id}" th:value="${o.id}"
+                                       th:checked="${o.id == q.selectedOptionId}" th:data-question-id="${q.id}">
+                                <span th:text="${o.text}">Option</span>
+                            </label>
+                        </li>
+                    </ul>
+                    <div class="btn-row" style="margin-top:1.25rem">
+                        <button type="button" class="btn prev-btn" th:disabled="${stat.first}">Previous</button>
+                        <button type="button" class="btn next-btn" th:disabled="${stat.last}">Next</button>
+                        <button type="button" class="btn flag-btn" th:attr="aria-pressed=${q.flagged}" th:data-question-id="${q.id}">Flag for review</button>
+                        <button type="button" class="btn clear-btn" th:data-question-id="${q.id}">Clear answer</button>
+                    </div>
+                </section>
+            </div>
+            <aside class="card" aria-labelledby="navigator-title">
+                <h2 id="navigator-title">Questions</h2>
+                <div class="navigator">
+                    <button type="button" class="nav-btn" th:each="q, stat : ${examSession.questions}"
+                            th:classappend="${q.selectedOptionId != null} ? 'answered'"
+                            th:data-index="${stat.index}" th:data-question-id="${q.id}"
+                            th:text="${q.number}" th:attr="aria-label='Go to question ' + ${q.number}">1</button>
+                </div>
+                <div class="legend">
+                    <span class="l-answered">Answered</span>
+                    <span class="l-open">Unanswered</span>
+                    <span class="l-flagged">Flagged</span>
+                </div>
+                <p class="hint" style="margin-top:1rem" id="progressText"></p>
+            </aside>
+        </div>
+    </main>
+
+    <form id="submitForm" th:action="@{/student/attempts/{id}/submit(id=${examSession.attemptId})}" method="post">
+        <input type="hidden" name="automatic" id="automaticField" value="false">
+    </form>
+
+    <dialog class="modal" id="submitDialog" aria-labelledby="submitTitle">
+        <div class="modal-body">
+            <h2 id="submitTitle">Submit exam?</h2>
+            <p id="submitMessage"></p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn" id="cancelSubmit">Keep working</button>
+            <button type="button" class="btn btn-primary" id="confirmSubmit">Submit now</button>
+        </div>
+    </dialog>
+</div>
+<script th:src="@{/js/app.js}"></script>
+<script th:src="@{/js/exam.js}"></script>
+</body>
+</html>

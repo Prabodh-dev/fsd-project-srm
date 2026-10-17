@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('Exams', 'exams', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1>Exams</h1>
+            <p>All published exams and their schedule.</p>
+        </div>
+    </div>
+    <form class="toolbar" th:action="@{/student/exams}" method="get" role="search">
+        <div class="field grow">
+            <label for="q">Search by title</label>
+            <input id="q" name="q" type="search" th:value="${q}">
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <div class="table-wrap" th:if="${cards.hasContent()}">
+        <table class="table">
+            <thead><tr><th scope="col">Exam</th><th scope="col">Teacher</th><th scope="col">Status</th><th scope="col">Window</th><th scope="col" class="num">Duration</th><th scope="col">Action</th></tr></thead>
+            <tbody>
+            <tr th:each="card : ${cards.content}">
+                <td class="cell-title" th:text="${card.exam.title}">Exam</td>
+                <td th:text="${card.exam.teacherName}">Teacher</td>
+                <td>
+                    <span class="badge" th:classappend="'badge-' + ${card.exam.status.badgeClass}" th:text="${card.exam.status.label}">Live</span>
+                    <span class="badge badge-neutral" th:if="${card.completed}">Attempted</span>
+                </td>
+                <td><span th:text="${#temporals.format(card.exam.startTime, 'dd MMM yyyy HH:mm')}"></span><div class="cell-sub" th:text="'to ' + ${#temporals.format(card.exam.endTime, 'dd MMM yyyy HH:mm')}"></div></td>
+                <td class="num" th:text="${card.exam.durationMinutes} + ' min'">30 min</td>
+                <td><a class="btn btn-small btn-primary" th:href="@{/student/exams/{id}/instructions(id=${card.exam.id})}" th:text="${card.activeAttemptId != null} ? 'Resume' : 'Open'">Open</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card empty-state" th:unless="${cards.hasContent()}">
+        <h3 th:text="${#strings.isEmpty(q)} ? 'No exams published yet' : 'No exams match your search'">Empty</h3>
+        <p th:if="${#strings.isEmpty(q)}">When teachers publish exams they will be listed here.</p>
+    </div>
+    <div th:replace="~{fragments/parts :: pagination(${cards}, '/student/exams', ${extraQuery})}"></div>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf != null} ? ${_csrf.token} : ''">
+    <meta name="_csrf_header" th:content="${_csrf != null} ? ${_csrf.headerName} : 'X-CSRF-TOKEN'">
+    <title th:text="${title} + ' | ExamEdge'">ExamEdge</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar" th:fragment="sidebar(active)" aria-label="Main navigation">
+    <div class="brand">
+        <span class="brand-mark" aria-hidden="true">E</span>
+        <a th:href="@{/dashboard}">ExamEdge</a>
+    </div>
+    <nav>
+        <ul class="nav-list" sec:authorize="hasRole('ADMIN')">
+            <li><a th:href="@{/admin}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a></li>
+            <li><a th:href="@{/admin/users}" th:classappend="${active == 'users'} ? 'active'">Users</a></li>
+            <li><a th:href="@{/admin/exams}" th:classappend="${active == 'exams'} ? 'active'">All exams</a></li>
+        </ul>
+        <ul class="nav-list" sec:authorize="hasRole('TEACHER')">
+            <li><a th:href="@{/teacher}" th:classappend="${active == 'dashboard'} ? 'active'">My exams</a></li>
+            <li><a th:href="@{/teacher/exams/new}" th:classappend="${active == 'new-exam'} ? 'active'">Create exam</a></li>
+        </ul>
+        <ul class="nav-list" sec:authorize="hasRole('STUDENT')">
+            <li><a th:href="@{/student}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a></li>
+            <li><a th:href="@{/student/exams}" th:classappend="${active == 'exams'} ? 'active'">Exams</a></li>
+            <li><a th:href="@{/student/history}" th:classappend="${active == 'history'} ? 'active'">My results</a></li>
+        </ul>
+        <p class="nav-heading">Account</p>
+        <ul class="nav-list">
+            <li><a th:href="@{/profile}" th:classappend="${active == 'profile'} ? 'active'">Profile</a></li>
+        </ul>
+    </nav>
+</aside>
+
+<header class="topbar" th:fragment="topbar">
+    <button type="button" class="btn btn-small menu-toggle" id="menuToggle" aria-controls="sidebar" aria-expanded="false">Menu</button>
+    <div class="topbar-spacer"></div>
+    <button type="button" class="btn btn-small" data-theme-toggle aria-pressed="false">Dark theme</button>
+    <a class="user-chip" th:href="@{/profile}">
+        <span class="avatar" aria-hidden="true" th:text="${#authentication.principal.fullName.substring(0, 1).toUpperCase()}">U</span>
+        <span class="mobile-hide">
+            <span th:text="${#authentication.principal.fullName}">User</span>
+            <span class="role-tag" th:text="${#authentication.principal.role}">ROLE</span>
+        </span>
+    </a>
+    <form th:action="@{/logout}" method="post" class="inline-form">
+        <button type="submit" class="btn btn-small">Sign out</button>
+    </form>
+</header>
+
+<div class="flash-area" th:fragment="flash">
+    <div class="alert alert-success" role="status" th:if="${flashSuccess != null}" th:text="${flashSuccess}"></div>
+    <div class="alert alert-error" role="alert" th:if="${flashError != null}" th:text="${flashError}"></div>
+</div>
+
+<footer class="site-footer" th:fragment="footer">
+    <span>ExamEdge - secure online examination and result analytics</span>
+</footer>
+
+<nav class="pagination" th:fragment="pagination(page, path, extra)" th:if="${page.totalPages > 1}" aria-label="Pagination">
+    <a class="btn btn-small" th:if="${page.hasPrevious()}" th:href="${path + '?page=' + (page.number - 1) + extra}">Previous</a>
+    <span class="page-info" th:text="'Page ' + ${page.number + 1} + ' of ' + ${page.totalPages}">Page 1 of 2</span>
+    <a class="btn btn-small" th:if="${page.hasNext()}" th:href="${path + '?page=' + (page.number + 1) + extra}">Next</a>
+</nav>
+
+<dialog class="modal" id="confirmDialog" th:fragment="confirmDialog" aria-labelledby="confirmTitle">
+    <div class="modal-body">
+        <h2 id="confirmTitle">Please confirm</h2>
+        <p id="confirmMessage"></p>
+    </div>
+    <div class="modal-actions">
+        <button type="button" class="btn" id="confirmCancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmAccept">Confirm</button>
+    </div>
+</dialog>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" th:fragment="shell(title, content)" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/parts :: head(${title})}"></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="public-header">
+    <span class="brand-mark" aria-hidden="true">E</span>
+    <a class="brand-link" th:href="@{/}"><strong>ExamEdge</strong></a>
+    <nav class="public-nav" aria-label="Site">
+        <button type="button" class="btn btn-small" data-theme-toggle aria-pressed="false">Dark theme</button>
+        <th:block sec:authorize="isAnonymous()">
+            <a class="btn btn-small" th:href="@{/login}">Sign in</a>
+            <a class="btn btn-small btn-primary" th:href="@{/register}">Create account</a>
+        </th:block>
+        <th:block sec:authorize="isAuthenticated()">
+            <a class="btn btn-small btn-primary" th:href="@{/dashboard}">Open dashboard</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <button type="submit" class="btn btn-small">Sign out</button>
+            </form>
+        </th:block>
+    </nav>
+</header>
+<main id="main">
+    <div class="content" th:if="${flashSuccess != null or flashError != null}">
+        <div th:replace="~{fragments/parts :: flash}"></div>
+    </div>
+    <th:block th:replace="${content}"></th:block>
+</main>
+<footer th:replace="~{fragments/parts :: footer}"></footer>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

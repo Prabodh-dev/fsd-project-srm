@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/public-shell :: shell('Access denied', ~{::content})}">
+<body>
+<th:block th:fragment="content">
+    <section class="error-page">
+        <p class="error-code">403</p>
+        <h1>Access denied</h1>
+        <p>Your account does not have permission to open this page.</p>
+        <div class="btn-row" style="justify-content:center">
+            <a class="btn btn-primary" th:href="@{/dashboard}">Go to dashboard</a>
+            <a class="btn" th:href="@{/}">Home page</a>
+        </div>
+    </section>
+</th:block>
+</body>
+</html>

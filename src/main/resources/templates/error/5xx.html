@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/public-shell :: shell('Something went wrong', ~{::content})}">
+<body>
+<th:block th:fragment="content">
+    <section class="error-page">
+        <p class="error-code">500</p>
+        <h1>Something went wrong</h1>
+        <p>An unexpected error occurred. Please try again in a moment.</p>
+        <div class="btn-row" style="justify-content:center">
+            <a class="btn btn-primary" th:href="@{/dashboard}">Go to dashboard</a>
+            <a class="btn" th:href="@{/}">Home page</a>
+        </div>
+    </section>
+</th:block>
+</body>
+</html>

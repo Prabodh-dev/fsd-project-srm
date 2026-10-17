@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/public-shell :: shell('Page not found', ~{::content})}">
+<body>
+<th:block th:fragment="content">
+    <section class="error-page">
+        <p class="error-code">404</p>
+        <h1>Page not found</h1>
+        <p>The page you are looking for does not exist or has been moved.</p>
+        <div class="btn-row" style="justify-content:center">
+            <a class="btn btn-primary" th:href="@{/dashboard}">Go to dashboard</a>
+            <a class="btn" th:href="@{/}">Home page</a>
+        </div>
+    </section>
+</th:block>
+</body>
+</html>

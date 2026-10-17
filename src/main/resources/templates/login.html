@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/public-shell :: shell('Sign in', ~{::content})}">
+<body>
+<th:block th:fragment="content">
+    <div class="auth-wrap">
+        <section class="card auth-card" aria-labelledby="login-title">
+            <h1 id="login-title">Sign in</h1>
+            <p class="hint">Use the email and password you registered with.</p>
+            <div class="alert alert-error" role="alert" th:if="${param.error != null}">Incorrect email or password.</div>
+            <div class="alert alert-error" role="alert" th:if="${param.locked != null}">This account is locked for 10 minutes after repeated failed sign in attempts.</div>
+            <div class="alert alert-error" role="alert" th:if="${param.disabled != null}">This account has been disabled. Contact an administrator.</div>
+            <div class="alert alert-info" role="status" th:if="${param.expired != null}">Your session ended because the account changed. Sign in again.</div>
+            <div class="alert alert-success" role="status" th:if="${param.logout != null}">You have been signed out.</div>
+            <form th:action="@{/login}" method="post" novalidate>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" autocomplete="username" required autofocus>
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%">Sign in</button>
+            </form>
+            <p class="hint" style="margin-top:1rem">New here? <a th:href="@{/register}">Create an account</a></p>
+        </section>
+    </div>
+</th:block>
+</body>
+</html>

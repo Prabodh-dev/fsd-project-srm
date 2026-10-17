@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/public-shell :: shell('Secure online exams', ~{::content})}">
+<body>
+<th:block th:fragment="content">
+    <section class="hero">
+        <h1>Run secure online exams and understand every result</h1>
+        <p>ExamEdge lets teachers build timed, proctored multiple choice exams, lets students sit them with a server enforced timer, and turns every submission into clear analytics.</p>
+        <div class="btn-row" style="justify-content:center">
+            <a class="btn btn-primary" th:href="@{/register}">Create a free account</a>
+            <a class="btn" th:href="@{/login}">Sign in</a>
+        </div>
+    </section>
+
+    <section class="section" aria-labelledby="features-title">
+        <h2 id="features-title">Everything an exam needs</h2>
+        <div class="grid grid-3">
+            <article class="card feature">
+                <h3>Server enforced timer</h3>
+                <p>The clock lives on the server. Reloading, reconnecting or changing devices restores your answers and the exact time left.</p>
+            </article>
+            <article class="card feature">
+                <h3>Proctoring signals</h3>
+                <p>Tab switches and window changes are logged with timestamps. Exams submit automatically once the violation limit is reached.</p>
+            </article>
+            <article class="card feature">
+                <h3>Randomised papers</h3>
+                <p>Question and option order can be shuffled per student and stays stable for the whole attempt.</p>
+            </article>
+            <article class="card feature">
+                <h3>Instant grading</h3>
+                <p>Answers are graded the moment an exam is submitted, with a full review of correct and chosen options.</p>
+            </article>
+            <article class="card feature">
+                <h3>Teacher analytics</h3>
+                <p>Score distribution, pass rate, completion time and per question accuracy highlight what to teach next.</p>
+            </article>
+            <article class="card feature">
+                <h3>Printable results</h3>
+                <p>Download a PDF report or print a clean result page. Teachers can export every result as CSV.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="section" aria-labelledby="how-title">
+        <h2 id="how-title">How it works</h2>
+        <div class="grid grid-3">
+            <div class="card">
+                <span class="step-number">1</span>
+                <h3>Teachers build</h3>
+                <p>Create an exam, add questions one by one or import them from a CSV file, then publish it for a time window.</p>
+            </div>
+            <div class="card">
+                <span class="step-number">2</span>
+                <h3>Students attempt</h3>
+                <p>Students read the instructions, start the attempt and answer with automatic saving and a question navigator.</p>
+            </div>
+            <div class="card">
+                <span class="step-number">3</span>
+                <h3>Everyone learns</h3>
+                <p>Students review their answers and leaderboard position while teachers study the analytics for the whole class.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-band" aria-labelledby="cta-title">
+        <h2 id="cta-title">Ready to run your next exam?</h2>
+        <p>Register as a teacher or a student in under a minute.</p>
+        <a class="btn" th:href="@{/register}">Create account</a>
+        <a class="btn" th:href="@{/login}">Sign in</a>
+    </section>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('Admin dashboard', 'dashboard', ~{::content}, 'chart.umd.js charts.js')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1>Admin dashboard</h1>
+            <p>Platform activity at a glance.</p>
+        </div>
+    </div>
+    <div class="grid grid-3">
+        <div class="card stat"><span class="stat-value" th:text="${dashboard.userCount}">0</span><span class="stat-label">Registered users</span></div>
+        <div class="card stat"><span class="stat-value" th:text="${dashboard.examCount}">0</span><span class="stat-label">Exams</span></div>
+        <div class="card stat"><span class="stat-value" th:text="${dashboard.attemptCount}">0</span><span class="stat-label">Exam attempts</span></div>
+    </div>
+    <div class="grid grid-2">
+        <div class="card stat"><span class="stat-value" th:text="${dashboard.teacherCount}">0</span><span class="stat-label">Teachers</span></div>
+        <div class="card stat"><span class="stat-value" th:text="${dashboard.studentCount}">0</span><span class="stat-label">Students</span></div>
+    </div>
+    <section class="card" aria-labelledby="activity-title">
+        <div class="card-title"><h2 id="activity-title">Registrations and attempts, last 14 days</h2></div>
+        <div class="chart-box">
+            <canvas data-chart-kind="admin" th:attr="data-chart=${dashboard.chartJson}" role="img" aria-label="Line chart of registrations and attempts per day"></canvas>
+        </div>
+    </section>
+</th:block>
+</body>
+</html>

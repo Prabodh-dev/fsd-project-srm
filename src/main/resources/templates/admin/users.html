@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('Users', 'users', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1>Users</h1>
+            <p>Search accounts, change roles and enable or disable access.</p>
+        </div>
+    </div>
+    <form class="toolbar" th:action="@{/admin/users}" method="get" role="search">
+        <div class="field grow">
+            <label for="q">Search by name or email</label>
+            <input id="q" name="q" type="search" th:value="${q}">
+        </div>
+        <div class="field">
+            <label for="roleFilter">Role</label>
+            <select id="roleFilter" name="role">
+                <option value="">All roles</option>
+                <option th:each="r : ${roles}" th:value="${r}" th:text="${r}" th:selected="${r.name() == role}"></option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+    <div class="table-wrap" th:if="${users.hasContent()}">
+        <table class="table">
+            <thead>
+            <tr><th scope="col">Name</th><th scope="col">Role</th><th scope="col">Status</th><th scope="col">Joined</th><th scope="col">Actions</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${users.content}">
+                <td><div class="cell-title" th:text="${u.fullName}">Name</div><div class="cell-sub" th:text="${u.email}">email</div></td>
+                <td>
+                    <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" th:if="${u.id != #authentication.principal.id}">
+                        <input type="hidden" name="returnQuery" th:value="${'page=' + users.number + extraQuery}">
+                        <label class="sr-only" th:for="${'role-' + u.id}" style="position:absolute;left:-999px">Role for user</label>
+                        <select th:id="${'role-' + u.id}" name="role" data-autosubmit aria-label="Change role">
+                            <option th:each="r : ${roles}" th:value="${r}" th:text="${r}" th:selected="${r == u.role}"></option>
+                        </select>
+                    </form>
+                    <span class="badge badge-info" th:if="${u.id == #authentication.principal.id}" th:text="${u.role}">ADMIN</span>
+                </td>
+                <td>
+                    <span class="badge badge-success" th:if="${u.enabled}">Enabled</span>
+                    <span class="badge badge-danger" th:unless="${u.enabled}">Disabled</span>
+                </td>
+                <td th:text="${#temporals.format(u.createdAt, 'dd MMM yyyy')}">date</td>
+                <td>
+                    <div class="cell-actions" th:if="${u.id != #authentication.principal.id}">
+                        <form th:action="@{/admin/users/{id}/enabled(id=${u.id})}" method="post" class="inline-form">
+                            <input type="hidden" name="enabled" th:value="${!u.enabled}">
+                            <input type="hidden" name="returnQuery" th:value="${'page=' + users.number + extraQuery}">
+                            <button type="submit" class="btn btn-small" th:text="${u.enabled} ? 'Disable' : 'Enable'">Disable</button>
+                        </form>
+                        <form th:action="@{/admin/users/{id}/delete(id=${u.id})}" method="post" class="inline-form"
+                              th:attr="data-confirm='Delete ' + ${u.fullName} + ' and all of their data? This cannot be undone.'">
+                            <input type="hidden" name="returnQuery" th:value="${'page=' + users.number + extraQuery}">
+                            <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        </form>
+                    </div>
+                    <span class="cell-sub" th:if="${u.id == #authentication.principal.id}">This is you</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card empty-state" th:unless="${users.hasContent()}">
+        <h3>No users match</h3>
+        <p>Try a different search term or clear the role filter.</p>
+    </div>
+    <div th:replace="~{fragments/parts :: pagination(${users}, '/admin/users', ${extraQuery})}"></div>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell(${questionId != null} ? 'Edit question' : 'Add question', 'dashboard', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${questionId != null} ? 'Edit question' : 'Add question'">Add question</h1>
+            <p th:text="${exam.title}">Exam</p>
+        </div>
+    </div>
+    <section class="card">
+        <form th:action="${questionId != null} ? @{/teacher/exams/{e}/questions/{q}(e=${exam.id},q=${questionId})} : @{/teacher/exams/{e}/questions(e=${exam.id})}"
+              th:object="${form}" method="post" novalidate>
+            <div class="alert alert-error" role="alert" th:if="${problems != null}">
+                <ul>
+                    <li th:each="problem : ${problems}" th:text="${problem}"></li>
+                </ul>
+            </div>
+            <div class="field">
+                <label for="text">Question</label>
+                <textarea id="text" th:field="*{text}" required maxlength="2000"></textarea>
+            </div>
+            <div class="field" style="max-width:200px">
+                <label for="marks">Marks</label>
+                <input id="marks" type="number" min="1" max="100" th:field="*{marks}" required>
+            </div>
+            <fieldset style="border:none;padding:0;margin:0 0 1rem">
+                <legend><strong>Options</strong> <span class="hint">Fill 2 to 6 options and select the correct one.</span></legend>
+                <div class="field" th:each="i : ${optionSlots}">
+                    <label th:for="${'option' + i}" th:text="'Option ' + ${i + 1}">Option</label>
+                    <div class="btn-row" style="flex-wrap:nowrap">
+                        <input type="radio" name="correctIndex" th:value="${i}" th:checked="${form.correctIndex == i}"
+                               th:aria-label="'Mark option ' + ${i + 1} + ' as correct'" style="width:22px;height:22px;flex-shrink:0">
+                        <input th:id="${'option' + i}" type="text" th:field="*{optionTexts[__${i}__]}" maxlength="1000">
+                    </div>
+                </div>
+            </fieldset>
+            <div class="btn-row">
+                <button type="submit" class="btn btn-primary">Save question</button>
+                <a class="btn" th:href="@{/teacher/exams/{e}/questions(e=${exam.id})}">Cancel</a>
+            </div>
+        </form>
+    </section>
+</th:block>
+</body>
+</html>

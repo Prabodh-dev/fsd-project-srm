@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('Questions', 'dashboard', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${exam.title}">Exam</h1>
+            <p>
+                <span class="badge" th:classappend="'badge-' + ${exam.status.badgeClass}" th:text="${exam.status.label}">Draft</span>
+                <span th:text="${exam.questionCount} + ' questions, ' + ${exam.totalMarks} + ' marks'"></span>
+            </p>
+        </div>
+        <div class="btn-row">
+            <a class="btn btn-primary" th:href="@{/teacher/exams/{id}/questions/new(id=${exam.id})}">Add question</a>
+            <a class="btn" th:href="@{/teacher}">Back to exams</a>
+        </div>
+    </div>
+
+    <div class="alert alert-error" role="alert" th:if="${importErrors != null}">
+        <strong>Some rows were skipped:</strong>
+        <ul>
+            <li th:each="error : ${importErrors}" th:text="'Row ' + ${error.rowNumber} + ': ' + ${error.message}"></li>
+        </ul>
+    </div>
+
+    <section class="card" aria-labelledby="import-title">
+        <div class="card-title"><h2 id="import-title">Bulk import from CSV</h2></div>
+        <p class="hint">Columns: question, marks, option1 to option6, correct (the number of the correct option, 1 to 6). Rows with problems are skipped and reported.</p>
+        <form th:action="@{/teacher/exams/{id}/questions/import(id=${exam.id})}" method="post" enctype="multipart/form-data" class="toolbar">
+            <div class="field grow">
+                <label for="file">CSV file</label>
+                <input id="file" name="file" type="file" accept=".csv,text/csv" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Import</button>
+            <a class="btn" th:href="@{/samples/questions-sample.csv}" download>Download sample CSV</a>
+        </form>
+    </section>
+
+    <form class="toolbar" th:action="@{/teacher/exams/{id}/questions(id=${exam.id})}" method="get" role="search">
+        <div class="field grow">
+            <label for="q">Search questions</label>
+            <input id="q" name="q" type="search" th:value="${q}">
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <div class="table-wrap" th:if="${questions.hasContent()}">
+        <table class="table">
+            <thead>
+            <tr><th scope="col" class="num">Order</th><th scope="col">Question</th><th scope="col" class="num">Marks</th><th scope="col" class="num">Options</th><th scope="col">Actions</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="question : ${questions.content}">
+                <td class="num" th:text="${question.displayOrder}">1</td>
+                <td th:text="${#strings.abbreviate(question.text, 120)}">Question</td>
+                <td class="num" th:text="${question.marks}">1</td>
+                <td class="num" th:text="${question.options.size()}">4</td>
+                <td>
+                    <div class="cell-actions">
+                        <form th:action="@{/teacher/exams/{e}/questions/{q}/move(e=${exam.id},q=${question.id})}" method="post" class="inline-form">
+                            <input type="hidden" name="up" value="true">
+                            <input type="hidden" name="page" th:value="${questions.number}">
+                            <button type="submit" class="btn btn-small" aria-label="Move question up">Up</button>
+                        </form>
+                        <form th:action="@{/teacher/exams/{e}/questions/{q}/move(e=${exam.id},q=${question.id})}" method="post" class="inline-form">
+                            <input type="hidden" name="up" value="false">
+                            <input type="hidden" name="page" th:value="${questions.number}">
+                            <button type="submit" class="btn btn-small" aria-label="Move question down">Down</button>
+                        </form>
+                        <a class="btn btn-small" th:href="@{/teacher/exams/{e}/questions/{q}/edit(e=${exam.id},q=${question.id})}">Edit</a>
+                        <form th:action="@{/teacher/exams/{e}/questions/{q}/delete(e=${exam.id},q=${question.id})}" method="post" class="inline-form"
+                              data-confirm="Delete this question?">
+                            <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card empty-state" th:unless="${questions.hasContent()}">
+        <h3 th:text="${#strings.isEmpty(q)} ? 'No questions yet' : 'No questions match your search'">Empty</h3>
+        <p th:if="${#strings.isEmpty(q)}">Add a question with the builder or import several at once from a CSV file.</p>
+    </div>
+    <div th:replace="~{fragments/parts :: pagination(${questions}, '/teacher/exams/' + ${exam.id} + '/questions', ${extraQuery})}"></div>
+</th:block>
+</body>
+</html>

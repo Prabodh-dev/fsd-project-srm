@@ -1,0 +1,7 @@
+question,marks,option1,option2,option3,option4,option5,option6,correct
+Which data structure uses first in first out ordering?,1,Stack,Queue,Tree,Graph,,,2
+What does the acronym JVM stand for?,1,Java Virtual Machine,Java Variable Method,Joint Value Model,Java Verified Module,,,1
+"Which of these is a relational database, in the strict sense?",2,MySQL,Redis,Memcached,Neo4j,,,1
+Which HTTP status code indicates a successful request?,1,200,301,404,500,,,1
+Which keyword declares a constant in Java?,1,const,final,static,fixed,,,2
+Which layer of the OSI model handles routing?,2,Physical,Data link,Network,Transport,Session,Application,3

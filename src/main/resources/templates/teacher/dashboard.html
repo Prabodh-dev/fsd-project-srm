@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('My exams', 'dashboard', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1>My exams</h1>
+            <p>Build, publish and review your exams.</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/teacher/exams/new}">Create exam</a>
+    </div>
+    <form class="toolbar" th:action="@{/teacher}" method="get" role="search">
+        <div class="field grow">
+            <label for="q">Search by title</label>
+            <input id="q" name="q" type="search" th:value="${q}">
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <div class="table-wrap" th:if="${exams.hasContent()}">
+        <table class="table">
+            <thead>
+            <tr><th scope="col">Exam</th><th scope="col">Status</th><th scope="col">Window</th><th scope="col" class="num">Questions</th><th scope="col" class="num">Marks</th><th scope="col" class="num">Attempts</th><th scope="col">Actions</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="e : ${exams.content}">
+                <td>
+                    <div class="cell-title" th:text="${e.title}">Title</div>
+                    <div class="cell-sub" th:text="${e.durationMinutes} + ' minutes, pass at ' + ${e.passingPercentage} + '%'">30 minutes</div>
+                </td>
+                <td><span class="badge" th:classappend="'badge-' + ${e.status.badgeClass}" th:text="${e.status.label}">Draft</span></td>
+                <td>
+                    <div th:text="${#temporals.format(e.startTime, 'dd MMM yyyy HH:mm')}">start</div>
+                    <div class="cell-sub" th:text="'to ' + ${#temporals.format(e.endTime, 'dd MMM yyyy HH:mm')}">end</div>
+                </td>
+                <td class="num" th:text="${e.questionCount}">0</td>
+                <td class="num" th:text="${e.totalMarks}">0</td>
+                <td class="num" th:text="${e.attemptCount}">0</td>
+                <td>
+                    <div class="cell-actions">
+                        <a class="btn btn-small" th:href="@{/teacher/exams/{id}/questions(id=${e.id})}">Questions</a>
+                        <a class="btn btn-small" th:href="@{/teacher/exams/{id}/results(id=${e.id})}">Results</a>
+                        <a class="btn btn-small" th:href="@{/teacher/exams/{id}/analytics(id=${e.id})}">Analytics</a>
+                        <a class="btn btn-small" th:href="@{/teacher/exams/{id}/edit(id=${e.id})}">Edit</a>
+                        <form th:action="@{/teacher/exams/{id}/publish(id=${e.id})}" method="post" class="inline-form" th:unless="${e.published}">
+                            <button type="submit" class="btn btn-small btn-primary">Publish</button>
+                        </form>
+                        <form th:action="@{/teacher/exams/{id}/unpublish(id=${e.id})}" method="post" class="inline-form" th:if="${e.published}">
+                            <button type="submit" class="btn btn-small">Unpublish</button>
+                        </form>
+                        <form th:action="@{/teacher/exams/{id}/delete(id=${e.id})}" method="post" class="inline-form"
+                              th:attr="data-confirm='Delete the exam ' + ${e.title} + ' with its questions and all attempts?'">
+                            <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card empty-state" th:unless="${exams.hasContent()}">
+        <h3 th:text="${#strings.isEmpty(q)} ? 'You have not created any exams yet' : 'No exams match your search'">Empty</h3>
+        <p th:if="${#strings.isEmpty(q)}">Create an exam, add questions or import them from a CSV file, then publish it for students.</p>
+        <a class="btn btn-primary" th:if="${#strings.isEmpty(q)}" th:href="@{/teacher/exams/new}">Create your first exam</a>
+    </div>
+    <div th:replace="~{fragments/parts :: pagination(${exams}, '/teacher', ${extraQuery})}"></div>
+</th:block>
+</body>
+</html>

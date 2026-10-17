@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell(${editing} ? 'Edit exam' : 'Create exam', ${editing} ? 'dashboard' : 'new-exam', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${editing} ? 'Edit exam' : 'Create exam'">Create exam</h1>
+            <p>Total marks are calculated from the questions you add.</p>
+        </div>
+    </div>
+    <section class="card">
+        <form th:action="${editing} ? @{/teacher/exams/{id}(id=${examId})} : @{/teacher/exams}" th:object="${form}" method="post" novalidate>
+            <div class="alert alert-error" role="alert" th:if="${#fields.hasErrors('*')}">Please correct the highlighted fields.</div>
+            <div class="form-grid">
+                <div class="field field-wide" th:classappend="${#fields.hasErrors('title')} ? 'has-error'">
+                    <label for="title">Title</label>
+                    <input id="title" type="text" th:field="*{title}" required maxlength="150">
+                    <p class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+                </div>
+                <div class="field field-wide" th:classappend="${#fields.hasErrors('description')} ? 'has-error'">
+                    <label for="description">Description</label>
+                    <textarea id="description" th:field="*{description}" maxlength="2000"></textarea>
+                    <p class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
+                </div>
+                <div class="field" th:classappend="${#fields.hasErrors('startTime')} ? 'has-error'">
+                    <label for="startTime">Opens at</label>
+                    <input id="startTime" type="datetime-local" th:field="*{startTime}" required>
+                    <p class="field-error" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></p>
+                </div>
+                <div class="field" th:classappend="${#fields.hasErrors('endTime')} ? 'has-error'">
+                    <label for="endTime">Closes at</label>
+                    <input id="endTime" type="datetime-local" th:field="*{endTime}" required>
+                    <p class="field-error" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></p>
+                </div>
+                <div class="field" th:classappend="${#fields.hasErrors('durationMinutes')} ? 'has-error'">
+                    <label for="durationMinutes">Duration (minutes)</label>
+                    <input id="durationMinutes" type="number" min="1" max="600" th:field="*{durationMinutes}" required>
+                    <p class="field-error" th:if="${#fields.hasErrors('durationMinutes')}" th:errors="*{durationMinutes}"></p>
+                </div>
+                <div class="field" th:classappend="${#fields.hasErrors('passingPercentage')} ? 'has-error'">
+                    <label for="passingPercentage">Passing percentage</label>
+                    <input id="passingPercentage" type="number" min="0" max="100" th:field="*{passingPercentage}" required>
+                    <p class="field-error" th:if="${#fields.hasErrors('passingPercentage')}" th:errors="*{passingPercentage}"></p>
+                </div>
+                <div class="field" th:classappend="${#fields.hasErrors('maxViolations')} ? 'has-error'">
+                    <label for="maxViolations">Maximum proctoring violations</label>
+                    <input id="maxViolations" type="number" min="1" max="20" th:field="*{maxViolations}" required>
+                    <span class="hint">The attempt is submitted automatically when this many tab switches or window blurs are recorded.</span>
+                    <p class="field-error" th:if="${#fields.hasErrors('maxViolations')}" th:errors="*{maxViolations}"></p>
+                </div>
+                <div class="field">
+                    <span class="hint">Options</span>
+                    <label class="check"><input type="checkbox" th:field="*{shuffleQuestions}"> Shuffle questions and options per student</label>
+                    <label class="check"><input type="checkbox" th:field="*{allowRetake}"> Allow students to retake the exam</label>
+                </div>
+            </div>
+            <div class="btn-row" style="margin-top:1.25rem">
+                <button type="submit" class="btn btn-primary" th:text="${editing} ? 'Save changes' : 'Create exam'">Save</button>
+                <a class="btn" th:href="@{/teacher}">Cancel</a>
+            </div>
+        </form>
+    </section>
+</th:block>
+</body>
+</html>

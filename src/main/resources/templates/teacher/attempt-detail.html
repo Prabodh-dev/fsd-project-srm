@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('Attempt detail', 'dashboard', ~{::content}, '')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${result.summary.studentName}">Student</h1>
+            <p th:text="${result.summary.examTitle}">Exam</p>
+        </div>
+        <a class="btn" th:href="@{/teacher/exams/{id}/results(id=${result.summary.examId})}">Back to results</a>
+    </div>
+    <section class="card" aria-labelledby="summary-title">
+        <h2 id="summary-title">Summary</h2>
+        <dl class="summary-list">
+            <dt>Score</dt><dd th:text="${result.summary.score} + ' / ' + ${result.summary.totalMarks} + ' (' + ${result.summary.percentage} + '%)'"></dd>
+            <dt>Outcome</dt><dd><span class="badge badge-success" th:if="${result.summary.passed}">Pass</span><span class="badge badge-danger" th:unless="${result.summary.passed}">Fail</span></dd>
+            <dt>Status</dt><dd th:text="${result.summary.status}"></dd>
+            <dt>Started</dt><dd th:text="${#temporals.format(result.summary.startedAt, 'dd MMM yyyy HH:mm:ss')}"></dd>
+            <dt>Submitted</dt><dd th:text="${#temporals.format(result.summary.submittedAt, 'dd MMM yyyy HH:mm:ss')}"></dd>
+            <dt>Time taken</dt><dd th:text="${result.summary.timeTakenText}"></dd>
+            <dt>Violations</dt><dd th:text="${result.violationCount}"></dd>
+        </dl>
+    </section>
+    <section class="card" aria-labelledby="events-title">
+        <h2 id="events-title">Proctoring events</h2>
+        <div class="table-wrap" th:if="${!events.isEmpty()}">
+            <table class="table">
+                <thead><tr><th scope="col">Time</th><th scope="col">Event</th></tr></thead>
+                <tbody>
+                <tr th:each="event : ${events}">
+                    <td th:text="${#temporals.format(event.occurredAt, 'dd MMM yyyy HH:mm:ss')}">time</td>
+                    <td th:text="${event.eventType}">TAB_SWITCH</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="empty-state" th:if="${events.isEmpty()}">
+            <p>No proctoring events were recorded for this attempt.</p>
+        </div>
+    </section>
+    <section aria-labelledby="answers-title">
+        <h2 id="answers-title">Answers compared with the answer key</h2>
+        <div th:replace="~{student/result :: reviewList(${result.items})}"></div>
+    </section>
+</th:block>
+</body>
+</html>

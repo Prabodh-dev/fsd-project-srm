@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/shell :: shell('Analytics', 'dashboard', ~{::content}, 'chart.umd.js charts.js')}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${exam.title} + ' - analytics'">Analytics</h1>
+            <p th:text="${analytics.attemptCount} + ' completed attempts out of ' + ${analytics.totalMarks} + ' total marks'"></p>
+        </div>
+        <div class="btn-row">
+            <a class="btn" th:href="@{/teacher/exams/{id}/results(id=${exam.id})}">Results</a>
+            <a class="btn" th:href="@{/teacher}">Back to exams</a>
+        </div>
+    </div>
+    <div class="card empty-state" th:if="${analytics.attemptCount == 0}">
+        <h3>No data yet</h3>
+        <p>Analytics are calculated from submitted attempts. Once students finish this exam, charts and statistics appear here.</p>
+    </div>
+    <th:block th:if="${analytics.attemptCount > 0}">
+        <div class="grid grid-4">
+            <div class="card stat"><span class="stat-value" th:text="${analytics.averageScore}">0</span><span class="stat-label">Average score</span></div>
+            <div class="card stat"><span class="stat-value" th:text="${analytics.highestScore}">0</span><span class="stat-label">Highest score</span></div>
+            <div class="card stat"><span class="stat-value" th:text="${analytics.lowestScore}">0</span><span class="stat-label">Lowest score</span></div>
+            <div class="card stat"><span class="stat-value" th:text="${analytics.passRate} + '%'">0%</span><span class="stat-label">Pass rate</span></div>
+        </div>
+        <div class="card stat"><span class="stat-value" th:text="${analytics.averageCompletionText}">0m</span><span class="stat-label">Average completion time</span></div>
+        <div class="grid grid-2">
+            <section class="card" aria-labelledby="hist-title">
+                <div class="card-title"><h2 id="hist-title">Score distribution</h2></div>
+                <div class="chart-box"><canvas data-chart-kind="histogram" th:attr="data-chart=${chartJson}" role="img" aria-label="Histogram of student scores"></canvas></div>
+            </section>
+            <section class="card" aria-labelledby="acc-title">
+                <div class="card-title"><h2 id="acc-title">Accuracy per question</h2></div>
+                <div class="chart-box"><canvas data-chart-kind="accuracy" th:attr="data-chart=${chartJson}" role="img" aria-label="Bar chart of correct answer percentage per question"></canvas></div>
+            </section>
+        </div>
+        <div class="grid grid-2">
+            <section class="card" aria-labelledby="hard-title">
+                <h2 id="hard-title">Hardest questions</h2>
+                <ol>
+                    <li th:each="item : ${analytics.hardest}">
+                        <strong th:text="'Q' + ${item.number} + ' - ' + ${item.accuracyPercentage} + '% correct'"></strong>
+                        <div class="cell-sub" th:text="${#strings.abbreviate(item.questionText, 140)}"></div>
+                    </li>
+                </ol>
+            </section>
+            <section class="card" aria-labelledby="easy-title">
+                <h2 id="easy-title">Easiest questions</h2>
+                <ol>
+                    <li th:each="item : ${analytics.easiest}">
+                        <strong th:text="'Q' + ${item.number} + ' - ' + ${item.accuracyPercentage} + '% correct'"></strong>
+                        <div class="cell-sub" th:text="${#strings.abbreviate(item.questionText, 140)}"></div>
+                    </li>
+                </ol>
+            </section>
+        </div>
+    </th:block>
+</th:block>
+</body>
+</html>
